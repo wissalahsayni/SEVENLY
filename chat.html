@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEVENLY — Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #1a0a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Manrope', sans-serif;
+    overflow: hidden;
+  }
+
+  .frame {
+    width: 430px;
+    height: 932px;
+    background: #0a0510;
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 2px rgba(139,59,255,0.2), 0 30px 80px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+    transform: scale(1);
+  }
+
+  @media (max-height: 1000px) { .frame { transform: scale(0.85); } }
+  @media (max-height: 900px) { .frame { transform: scale(0.75); } }
+  @media (max-height: 800px) { .frame { transform: scale(0.65); } }
+  @media (max-height: 700px) { .frame { transform: scale(0.55); } }
+  @media (max-height: 600px) { .frame { transform: scale(0.45); } }
+  @media (max-height: 500px) { .frame { transform: scale(0.35); } }
+
+  @media (max-width: 480px) {
+    .frame {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      transform: none !important;
+    }
+  }
+
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    z-index: 5;
+  }
+
+  .chat-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #0a0510;
+    padding: 55px 0 80px;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    display: flex;
+    align-items: center;
+    padding: 0 16px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    gap: 12px;
+  }
+
+  .chat-header .back-btn {
+    color: rgba(255,255,255,0.6);
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.2s;
+    padding: 4px;
+  }
+  .chat-header .back-btn:hover { color: white; }
+
+  .chat-header .chat-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #f5c451, #e8a930);
+    color: #0a0510;
+  }
+
+  .chat-header .chat-info {
+    flex: 1;
+  }
+
+  .chat-header .chat-info .name {
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .chat-header .chat-info .status {
+    color: #34d399;
+    font-size: 12px;
+  }
+
+  .chat-header .chat-actions {
+    display: flex;
+    gap: 16px;
+    color: rgba(255,255,255,0.4);
+    font-size: 20px;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .chat-messages::-webkit-scrollbar { display: none; }
+
+  .message {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    position: relative;
+  }
+
+  .message.received {
+    align-self: flex-start;
+    background: rgba(31, 26, 46, 0.8);
+    color: #f5f2fa;
+    border-bottom-left-radius: 4px;
+  }
+
+  .message.sent {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message .time {
+    font-size: 9px;
+    opacity: 0.5;
+    margin-top: 4px;
+    display: block;
+    text-align: right;
+  }
+
+  .message.sent .time {
+    color: rgba(255,255,255,0.7);
+  }
+
+  .message.received .time {
+    color: rgba(169, 159, 192, 0.5);
+  }
+
+  .chat-input {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    padding: 8px 16px;
+    background: rgba(10, 5, 16, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 20px;
+    background: rgba(31, 26, 46, 0.8);
+    border: 1px solid rgba(255,255,255,0.05);
+    color: #f5f2fa;
+    font-size: 14px;
+    font-family: 'Manrope', sans-serif;
+    outline: none;
+  }
+  .chat-input input::placeholder {
+    color: rgba(169, 159, 192, 0.4);
+  }
+  .chat-input input:focus {
+    border-color: rgba(139,59,255,0.3);
+  }
+
+  .chat-input .send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .chat-input .send-btn:active { transform: scale(0.9); }
+
+  .chat-input .attach-btn {
+    background: none;
+    border: none;
+    color: rgba(169, 159, 192, 0.4);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .tabbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px 12px 12px;
+    background: rgba(10, 5, 16, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    z-index: 15;
+  }
+
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(169, 159, 192, 0.4);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tab.active { color: #a877ff; }
+
+  .tab svg { width: 22px; height: 22px; }
+
+  .tab-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(139,59,255,0.3);
+    margin-top: -22px;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>●●●●○ WiFi 🔋</span>
+  </div>
+
+  <div class="chat-page">
+    <div class="chat-header">
+      <button class="back-btn" onclick="window.location.href='messages.html'">‹</button>
+      <div class="chat-avatar" id="chatAvatar">🐥</div>
+      <div class="chat-info">
+        <div class="name" id="chatUserName">jimin_92</div>
+        <div class="status" id="chatStatus">Online now</div>
+      </div>
+      <div class="chat-actions">
+        <span>📞</span>
+        <span>🔔</span>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages"></div>
+
+    <div class="chat-input">
+      <button class="attach-btn">➕</button>
+      <input type="text" id="messageInput" placeholder="Message..." onkeydown="if(event.key==='Enter') sendMessage()">
+      <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab" onclick="window.location.href='home.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12l9-9 9 9"/>
+        <path d="M5 10v10h4v-6h6v6h4V10"/>
+      </svg>
+      <span>Home</span>
+    </div>
+    <div class="tab" onclick="window.location.href='discover.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <span>Discover</span>
+    </div>
+    <div class="tab-fab" onclick="window.location.href='post.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </div>
+    <div class="tab active" onclick="window.location.href='messages.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+      <span>Messages</span>
+    </div>
+    <div class="tab" onclick="window.location.href='profile.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M5.3 18.3C6.8 16.5 9.2 15 12 15s5.2 1.5 6.7 3.3"/>
+      </svg>
+      <span>Profile</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Get user from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const userName = urlParams.get('user') || 'jimin_92';
+  const userEmoji = urlParams.get('emoji') || '🐥';
+
+  // Update header
+  document.getElementById('chatUserName').textContent = userName;
+  document.getElementById('chatAvatar').textContent = userEmoji;
+
+  // Predefined conversations
+  const conversations = {
+    'jimin_92': [
+      { text: 'OMG did you watch the concert last night? 😍', sent: false, time: '8:42 PM' },
+      { text: 'YES I was literally crying the whole time 😭', sent: true, time: '8:43 PM' },
+      { text: 'The purple ocean was so beautiful... 7 years right there 😍', sent: false, time: '8:44 PM' },
+      { text: 'I took so many videos I barely watched imao', sent: true, time: '8:44 PM' },
+      { text: 'SAME!!! my storage is full but no regrets 😭', sent: false, time: '8:48 PM' },
+      { text: 'Are you going to the second night?', sent: false, time: '8:48 PM' },
+      { text: 'I wish Tiktoks sold out so fast 😍 Are you going?', sent: true, time: '8:48 PM' },
+    ],
+    'purpleheart_92': [
+      { text: '💜 Hey ARMY! How are you?', sent: false, time: '10:30 AM' },
+      { text: 'I\'m doing great! 💜', sent: true, time: '10:32 AM' },
+      { text: 'Did you see BTS\'s new post? 🎉', sent: false, time: '10:35 AM' },
+      { text: 'YES! I can\'t believe it! 🔥', sent: true, time: '10:36 AM' },
+      { text: 'This is NOT a drill ARMY!! 💜', sent: false, time: '10:38 AM' },
+    ],
+    'army_forever': [
+      { text: '💜 Borahae!', sent: false, time: '9:00 AM' },
+      { text: 'Borahae! 💜', sent: true, time: '9:02 AM' },
+      { text: 'Are you ready for the comeback?', sent: false, time: '9:05 AM' },
+      { text: 'ALWAYS! 🔥', sent: true, time: '9:06 AM' },
+    ],
+    'bangtan_dreamer': [
+      { text: 'Omg sammi! 😭', sent: false, time: '11:00 AM' },
+      { text: 'I know right! 😭💜', sent: true, time: '11:02 AM' },
+      { text: 'The concert was everything!', sent: false, time: '11:05 AM' },
+    ],
+    'purple_ocean': [
+      { text: 'Streaming party starts at 8PM KST! 🎉', sent: false, time: '1:00 PM' },
+      { text: 'I\'ll be there! 💜', sent: true, time: '1:02 PM' },
+      { text: 'Let\'s break the record!', sent: false, time: '1:05 PM' },
+    ],
+    'hobi_sunshine': [
+      { text: 'J-Hope\'s solo album 💜', sent: false, time: '2:00 PM' },
+      { text: 'It\'s so good! 🔥', sent: true, time: '2:02 PM' },
+      { text: 'What\'s your favorite song?', sent: false, time: '2:05 PM' },
+    ],
+    'suga_beats': [
+      { text: 'Replied to your story 💜', sent: false, time: '5:00 PM' },
+      { text: 'Thank you! 🎧', sent: true, time: '5:02 PM' },
+      { text: 'Your story was amazing!', sent: false, time: '5:05 PM' },
+    ]
+  };
+
+  // Load messages for this user
+  const messages = conversations[userName] || [
+    { text: '💜 Welcome to SEVENLY!', sent: false, time: 'Now' },
+    { text: 'How can I help you today?', sent: false, time: 'Now' },
+  ];
+
+  const chatContainer = document.getElementById('chatMessages');
+
+  function renderMessages() {
+    chatContainer.innerHTML = '';
+    messages.forEach(msg => {
+      const div = document.createElement('div');
+      div.className = `message ${msg.sent ? 'sent' : 'received'}`;
+      div.innerHTML = `${msg.text}<span class="time">${msg.time}</span>`;
+      chatContainer.appendChild(div);
+    });
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    messages.push({ text, sent: true, time });
+    input.value = '';
+    renderMessages();
+
+    // Simulate reply
+    setTimeout(() => {
+      const replies = [
+        '💜 That\'s amazing!',
+        'I agree with you! 🎉',
+        'BTS forever! 💜',
+        '방탄소년단 💜',
+        'ARMY for life!',
+        '💜 You\'re the best!',
+        'Borahae! 💜',
+        'Suga is my bias!',
+        'Jungkook is so talented!',
+        'I love RM\'s lyrics!',
+        'J-Hope\'s dance is everything!',
+        'V is so cute!',
+        'Jimin\'s voice is angelic!',
+        'Jin is worldwide handsome!'
+      ];
+      const reply = replies[Math.floor(Math.random() * replies.length)];
+      const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      messages.push({ text: reply, sent: false, time: replyTime });
+      renderMessages();
+    }, 1000 + Math.random() * 1500);
+  }
+
+  renderMessages();
+</script>
+
+</body>
+</html>

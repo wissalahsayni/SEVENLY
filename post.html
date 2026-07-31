@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SEVENLY — Create Post</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #1a0a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Manrope', sans-serif;
+    overflow: hidden;
+  }
+
+  .frame {
+    width: 430px;
+    height: 932px;
+    background: #0a0510;
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 2px rgba(139,59,255,0.2), 0 30px 80px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+    transform: scale(1);
+  }
+
+  @media (max-height: 1000px) { .frame { transform: scale(0.85); } }
+  @media (max-height: 900px) { .frame { transform: scale(0.75); } }
+  @media (max-height: 800px) { .frame { transform: scale(0.65); } }
+  @media (max-height: 700px) { .frame { transform: scale(0.55); } }
+  @media (max-height: 600px) { .frame { transform: scale(0.45); } }
+  @media (max-height: 500px) { .frame { transform: scale(0.35); } }
+
+  @media (max-width: 480px) {
+    .frame {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      transform: none !important;
+    }
+  }
+
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    z-index: 5;
+  }
+
+  .create-post-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #411971;
+    padding: 55px 16px 80px;
+    overflow: hidden;
+  }
+
+  .create-post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .create-post-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    background: linear-gradient(135deg, #a877ff, #f5c451);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .create-post-header .close-btn {
+    color: rgba(255,255,255,0.6);
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    transition: color 0.2s;
+    padding: 4px;
+  }
+  .create-post-header .close-btn:hover { color: white; }
+
+  .create-post-header .post-btn {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .create-post-header .post-btn.active {
+    opacity: 1;
+  }
+  .create-post-header .post-btn:active { transform: scale(0.95); }
+
+  /* Image Upload Area */
+  .image-upload-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 2px dashed rgba(139,59,255,0.2);
+    border-radius: 16px;
+    margin: 16px 0;
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+    position: relative;
+    min-height: 200px;
+    background: rgba(31, 26, 46, 0.3);
+  }
+  .image-upload-area:hover {
+    border-color: rgba(139,59,255,0.4);
+    background: rgba(31, 26, 46, 0.5);
+  }
+
+  .image-upload-area .upload-icon {
+    font-size: 48px;
+    color: rgba(169, 159, 192, 0.3);
+    margin-bottom: 8px;
+  }
+
+  .image-upload-area .upload-text {
+    font-size: 14px;
+    color: rgba(169, 159, 192, 0.4);
+  }
+
+  .image-upload-area .upload-text span {
+    background: linear-gradient(135deg, #a877ff, #f5c451);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .image-upload-area .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .image-upload-area .preview-image.show {
+    display: block;
+  }
+
+  .image-upload-area .remove-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+    cursor: pointer;
+    display: none;
+    z-index: 5;
+    align-items: center;
+    justify-content: center;
+  }
+  .image-upload-area .remove-image.show {
+    display: flex;
+  }
+  .image-upload-area .remove-image:hover {
+    background: rgba(240,83,122,0.8);
+  }
+
+  /* Caption Input */
+  .caption-input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(31, 26, 46, 0.8);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #f5f2fa;
+    font-size: 14px;
+    font-family: 'Manrope', sans-serif;
+    outline: none;
+    resize: none;
+    min-height: 80px;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+  .caption-input::placeholder {
+    color: rgba(169, 159, 192, 0.4);
+  }
+  .caption-input:focus {
+    border-color: rgba(139,59,255,0.3);
+  }
+
+  /* Community Select */
+  .community-select {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+  }
+
+  .community-select select {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(31, 26, 46, 0.8);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #f5f2fa;
+    font-size: 14px;
+    font-family: 'Manrope', sans-serif;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  .community-select select:focus {
+    border-color: rgba(139,59,255,0.3);
+  }
+  .community-select select option {
+    background: #0a0510;
+    color: #f5f2fa;
+  }
+
+  .community-select .tag-btn {
+    padding: 10px 16px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(31, 26, 46, 0.8);
+    color: rgba(169, 159, 192, 0.5);
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+    font-family: 'Manrope', sans-serif;
+  }
+  .community-select .tag-btn:hover {
+    background: rgba(31, 26, 46, 1);
+  }
+  .community-select .tag-btn.active {
+    background: rgba(139,59,255,0.2);
+    color: #a877ff;
+  }
+
+  /* Tab Bar */
+  .tabbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px 12px 12px;
+    background: rgba(10, 5, 16, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    z-index: 15;
+  }
+
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(169, 159, 192, 0.4);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tab.active { color: #a877ff; }
+
+  .tab svg { width: 22px; height: 22px; }
+
+  .tab-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(139,59,255,0.3);
+    margin-top: -22px;
+    color: white;
+    cursor: pointer;
+  }
+
+  #fileInput {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>●●●●○ WiFi 🔋</span>
+  </div>
+
+  <div class="create-post-page">
+    <div class="create-post-header">
+      <button class="close-btn" onclick="window.location.href='home.html'">✕</button>
+      <h1>New Post</h1>
+      <button class="post-btn" id="postBtn" disabled onclick="createPost()">Post</button>
+    </div>
+
+    <!-- Image Upload -->
+    <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+      <span class="upload-icon">📸</span>
+      <div class="upload-text">Tap to <span>add a photo</span></div>
+      <img src="" alt="Preview" class="preview-image" id="previewImage">
+      <button class="remove-image" id="removeImage" onclick="removeImage(event)">✕</button>
+    </div>
+
+    <input type="file" id="fileInput" accept="image/*" onchange="previewFile(event)">
+
+    <!-- Community Select -->
+    <div class="community-select">
+      <select id="communitySelect">
+        <option value="ARMY">💜 ARMY</option>
+        <option value="BTS Official">💜 BTS Official</option>
+        <option value="ARMY Cofe">🌟 ARMY Cofe</option>
+        <option value="Purple Ocean">🌊 Purple Ocean</option>
+        <option value="Bangtan Letters">📝 Bangtan Letters</option>
+      </select>
+      <button class="tag-btn" id="tagBtn" onclick="toggleTag()">#ARMY</button>
+    </div>
+
+    <!-- Caption -->
+    <textarea class="caption-input" id="captionInput" placeholder="What's on your mind? 💜" rows="3"></textarea>
+
+    <!-- Bottom Tab Bar -->
+    <div class="tabbar">
+      <div class="tab" onclick="window.location.href='home.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12l9-9 9 9"/>
+          <path d="M5 10v10h4v-6h6v6h4V10"/>
+        </svg>
+        <span>Home</span>
+      </div>
+      <div class="tab" onclick="alert('Discover page coming soon!')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <span>Discover</span>
+      </div>
+      <div class="tab-fab active" onclick="window.location.href='post.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </div>
+      <div class="tab" onclick="window.location.href='messages.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span>Messages</span>
+      </div>
+      <div class="tab" onclick="window.location.href='profile.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M5.3 18.3C6.8 16.5 9.2 15 12 15s5.2 1.5 6.7 3.3"/>
+        </svg>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let selectedFile = null;
+  let isTagActive = false;
+
+  function previewFile(event) {
+    const file = event.target.files[0];
+    if (file) {
+      selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('previewImage');
+        const uploadArea = document.getElementById('uploadArea');
+        const removeBtn = document.getElementById('removeImage');
+        img.src = e.target.result;
+        img.classList.add('show');
+        removeBtn.classList.add('show');
+        uploadArea.querySelector('.upload-icon').style.display = 'none';
+        uploadArea.querySelector('.upload-text').style.display = 'none';
+        uploadArea.style.border = 'none';
+        uploadArea.style.padding = '0';
+        document.getElementById('postBtn').disabled = false;
+        document.getElementById('postBtn').classList.add('active');
+      }
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function removeImage(event) {
+    event.stopPropagation();
+    selectedFile = null;
+    const img = document.getElementById('previewImage');
+    const uploadArea = document.getElementById('uploadArea');
+    const removeBtn = document.getElementById('removeImage');
+    img.src = '';
+    img.classList.remove('show');
+    removeBtn.classList.remove('show');
+    uploadArea.querySelector('.upload-icon').style.display = 'block';
+    uploadArea.querySelector('.upload-text').style.display = 'block';
+    uploadArea.style.border = '2px dashed rgba(139,59,255,0.2)';
+    uploadArea.style.padding = '';
+    document.getElementById('postBtn').disabled = true;
+    document.getElementById('postBtn').classList.remove('active');
+    document.getElementById('fileInput').value = '';
+  }
+
+  function toggleTag() {
+    const btn = document.getElementById('tagBtn');
+    isTagActive = !isTagActive;
+    if (isTagActive) {
+      btn.classList.add('active');
+      btn.textContent = '#ARMY 💜';
+    } else {
+      btn.classList.remove('active');
+      btn.textContent = '#ARMY';
+    }
+  }
+
+  function createPost() {
+    const caption = document.getElementById('captionInput').value.trim();
+    const community = document.getElementById('communitySelect').value;
+    const tag = document.getElementById('tagBtn').textContent;
+
+    if (!selectedFile && !caption) {
+      alert('Please add a photo or write a caption! 📸');
+      return;
+    }
+
+    const btn = document.getElementById('postBtn');
+    btn.textContent = '✅ Posted!';
+    btn.style.background = '#34d399';
+    btn.style.color = 'white';
+
+    // Add to localStorage to show new post (optional)
+    const newPost = {
+      id: Date.now(),
+      user: 'army_forever',
+      caption: caption || '💜 New post!',
+      community: community,
+      tag: tag,
+      likes: 0,
+      comments: 0,
+      time: 'Just now'
+    };
+
+    // Save to localStorage
+    let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+    posts.unshift(newPost);
+    localStorage.setItem('posts', JSON.stringify(posts));
+
+    setTimeout(() => {
+      window.location.href = 'home.html';
+    }, 1200);
+  }
+
+  // Auto-enable post button when caption is typed
+  document.getElementById('captionInput').addEventListener('input', function() {
+    const btn = document.getElementById('postBtn');
+    if (this.value.trim() || selectedFile) {
+      btn.disabled = false;
+      btn.classList.add('active');
+    } else if (!selectedFile) {
+      btn.disabled = true;
+      btn.classList.remove('active');
+    }
+  });
+</script>
+
+</body>
+</html>

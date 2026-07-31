@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEVENLY — Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #1a0a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Manrope', sans-serif;
+    overflow: hidden;
+  }
+
+  .frame {
+    width: 430px;
+    height: 932px;
+    background: #0a0510;
+    border-radius: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 0 2px rgba(139,59,255,0.2), 0 30px 80px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+    transform: scale(1);
+  }
+
+  @media (max-height: 1000px) { .frame { transform: scale(0.85); } }
+  @media (max-height: 900px) { .frame { transform: scale(0.75); } }
+  @media (max-height: 800px) { .frame { transform: scale(0.65); } }
+  @media (max-height: 700px) { .frame { transform: scale(0.55); } }
+  @media (max-height: 600px) { .frame { transform: scale(0.45); } }
+  @media (max-height: 500px) { .frame { transform: scale(0.35); } }
+
+  @media (max-width: 480px) {
+    .frame {
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      transform: none !important;
+    }
+  }
+
+  .status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 28px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.9);
+    z-index: 5;
+  }
+
+  .profile-page {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #0a0510;
+    padding: 55px 16px 80px;
+    overflow: hidden;
+  }
+
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .profile-header h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    background: #411971;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .profile-header .header-icons {
+    display: flex;
+    gap: 16px;
+    color: rgba(255,255,255,0.6);
+    font-size: 20px;
+  }
+
+  .profile-header .header-icons span {
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .profile-header .header-icons span:hover { transform: scale(1.1); }
+
+  .profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b3bff, #f5c451);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    padding: 3px;
+    margin-bottom: 10px;
+  }
+
+  .profile-avatar .inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: #1a1035;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0a0510;
+  }
+
+  .profile-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #f5f2fa;
+  }
+
+  .profile-username {
+    font-size: 14px;
+    color: rgba(169, 159, 192, 0.6);
+    margin-top: 2px;
+  }
+
+  .profile-bio {
+    font-size: 13px;
+    color: rgba(169, 159, 192, 0.7);
+    text-align: center;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .profile-bio span {
+    background: linear-gradient(135deg, #a877ff, #f5c451);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .profile-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .profile-stats .stat {
+    text-align: center;
+  }
+
+  .profile-stats .stat .number {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f5f2fa;
+  }
+
+  .profile-stats .stat .label {
+    font-size: 11px;
+    color: rgba(169, 159, 192, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+  }
+
+  .profile-actions {
+    display: flex;
+    gap: 10px;
+    padding: 12px 0 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    flex-shrink: 0;
+  }
+
+  .profile-actions .btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.15s;
+  }
+  .profile-actions .btn:active { transform: scale(0.97); }
+
+  .btn-edit {
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    color: white;
+    box-shadow: 0 4px 16px rgba(139,59,255,0.2);
+    width: 100%;
+  }
+
+  .profile-tabs {
+    display: flex;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .profile-tabs .tab {
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(169, 159, 192, 0.4);
+    cursor: pointer;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+    position: relative;
+  }
+
+  .profile-tabs .tab.active {
+    color: #a877ff;
+    border-bottom-color: #a877ff;
+  }
+
+  .profile-tabs .tab:hover {
+    color: rgba(169, 159, 192, 0.8);
+  }
+
+  .profile-posts {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    padding-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
+  .profile-posts::-webkit-scrollbar { display: none; }
+
+  .profile-posts .post-item {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: rgba(31, 26, 46, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-posts .post-item:hover {
+    transform: scale(1.02);
+  }
+
+  .profile-posts .post-item .post-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 4px 6px;
+    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    display: flex;
+    gap: 8px;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .profile-posts .post-item:hover .post-overlay {
+    opacity: 1;
+  }
+
+  .profile-posts .post-item .post-overlay span {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .profile-posts .post-item .post-emoji {
+    font-size: 32px;
+  }
+
+  .profile-posts .post-item .post-multiple {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .tabbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px 12px 12px;
+    background: rgba(10, 5, 16, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    z-index: 15;
+  }
+
+  .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(169, 159, 192, 0.4);
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tab.active { color: #a877ff; }
+
+  .tab svg { width: 22px; height: 22px; }
+
+  .tab-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b3bff, #5f1fc4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(139,59,255,0.3);
+    margin-top: -22px;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>●●●●○ WiFi 🔋</span>
+  </div>
+
+  <div class="profile-page">
+    <div class="profile-header">
+      <h1>Profile</h1>
+      <div class="header-icons">
+        <span onclick="window.location.href='settings.html'">⚙️</span>
+      </div>
+    </div>
+
+    <div class="profile-info">
+      <div class="profile-avatar">
+        <div class="inner">💜</div>
+      </div>
+      <div class="profile-name">Kim Namjoon</div>
+      <div class="profile-username">@army_forever</div>
+      <div class="profile-bio">
+        💜 <span>BTS</span> is my life • <span>ARMY</span> forever • 🌟
+      </div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="stat">
+        <div class="number">12</div>
+        <div class="label">Posts</div>
+      </div>
+      <div class="stat">
+        <div class="number">2.4K</div>
+        <div class="label">Followers</div>
+      </div>
+      <div class="stat">
+        <div class="number">1.8K</div>
+        <div class="label">Following</div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn btn-edit" onclick="alert('Edit profile coming soon!')">✏️ Edit Profile</button>
+    </div>
+
+    <div class="profile-tabs">
+      <div class="tab active" onclick="switchTab(this, 'grid')">📷 Posts</div>
+      <div class="tab" onclick="switchTab(this, 'reels')">🎬 Reels</div>
+      <div class="tab" onclick="switchTab(this, 'likes')">❤️ Likes</div>
+    </div>
+
+    <div class="profile-posts" id="postsGrid">
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">💜</span>
+        <span class="post-multiple">📸</span>
+        <div class="post-overlay">
+          <span>❤️ 2.4K</span>
+          <span>💬 892</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">🌟</span>
+        <div class="post-overlay">
+          <span>❤️ 1.2K</span>
+          <span>💬 345</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">🌌</span>
+        <span class="post-multiple">📸</span>
+        <div class="post-overlay">
+          <span>❤️ 4.2K</span>
+          <span>💬 1.8K</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">🌸</span>
+        <div class="post-overlay">
+          <span>❤️ 0.8K</span>
+          <span>💬 567</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">🔥</span>
+        <span class="post-multiple">📸</span>
+        <div class="post-overlay">
+          <span>❤️ 3.1K</span>
+          <span>💬 1.2K</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">🌊</span>
+        <div class="post-overlay">
+          <span>❤️ 0.6K</span>
+          <span>💬 234</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">🎵</span>
+        <div class="post-overlay">
+          <span>❤️ 5.2K</span>
+          <span>💬 2.1K</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">✨</span>
+        <span class="post-multiple">📸</span>
+        <div class="post-overlay">
+          <span>❤️ 1.8K</span>
+          <span>💬 678</span>
+        </div>
+      </div>
+      <div class="post-item" onclick="alert('View post!')">
+        <span class="post-emoji">💫</span>
+        <div class="post-overlay">
+          <span>❤️ 2.9K</span>
+          <span>💬 1.1K</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab" onclick="window.location.href='home.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12l9-9 9 9"/>
+        <path d="M5 10v10h4v-6h6v6h4V10"/>
+      </svg>
+      <span>Home</span>
+    </div>
+    <div class="tab" onclick="alert('Discover page coming soon!')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19 12a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+      <span>Discover</span>
+    </div>
+    <div class="tab-fab" onclick="alert('Create post coming soon!')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </div>
+    <div class="tab" onclick="window.location.href='messages.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+      <span>Messages</span>
+    </div>
+    <div class="tab active" onclick="window.location.href='profile.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
